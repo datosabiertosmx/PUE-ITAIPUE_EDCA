@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" lang="es-MX" xml:lang="es-MX">
+
+<head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KNYE7DF2RM"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-KNYE7DF2RM');
+    </script>
+    <!-- End Google Analytics -->
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/contratacionesabiertas/static/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="/contratacionesabiertas/static/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/contratacionesabiertas/static/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+    <link rel='stylesheet' href='/contratacionesabiertas/static/stylesheets/main.css' />
+    <link rel='stylesheet' href='/contratacionesabiertas/static/stylesheets/style_d3bubble.css' />
+    <link rel="stylesheet" type="text/css" href="/contratacionesabiertas/static/bower_components/jqplot/jquery.jqplot.css" />
+    <link rel="stylesheet" href="/contratacionesabiertas/static/stylesheets/dashboard.css">
+    <link rel="import" href="<%= process.env.CDN_URL %>/bower_components/polymer/polymer.html">    
+    <link rel="import" href="/contratacionesabiertas/static/inai-navbar/dgm-navbar.html">
+    <link rel="import" href="/contratacionesabiertas/static/inai-footer/dgm-footer.html">
+    <link rel="stylesheet" type="text/css" href="/contratacionesabiertas/static/bower_components/tooltipster/dist/css/tooltipster.bundle.min.css" />
+    <link rel="stylesheet" type="text/css" href="/contratacionesabiertas/static/bower_components/tooltipster-follower/dist/css/tooltipster-follower.min.css" />
+    <script src="/contratacionesabiertas/static/javascripts/common.js"></script>
+	
+	<style no-shim>        
+        .navbar-default   { background-color: #FFFFFF; border: none; top: 158.5px; }
+
+        p{
+            text-align: justify;
+        }
+        table,th,td{
+            border: 1px solid black;
+        }
+        table{
+            width: 70%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        th,td{
+            padding: 15px 15px 0;
+            text-align: center;
+        }
+        th{
+            color: #FFFFFF;
+            background-color: #4d4d4d;
+        }
+        .th2{
+            padding: 15px 15px 15px;
+            background-color: #e04444;
+        }
+        .th3{
+            padding: 15px 15px 15px;
+            background-color: #8e7cc3;
+        }
+        .td2{
+            padding: 15px 15px 15px;
+            background-color: #f3f3f3;
+        }
+        .td3{
+            padding: 15px 15px 15px;
+            background-color: #f3f3f3;
+        }
+        .menuTopBar{
+            text-align: center;
+            background-color: #00bfa5;
+            position: fixed;
+            z-index: 4;
+            top: 106.5px;
+            max-width: none;
+            width: 100%;
+            padding: 0 10% 0;
+        }
+        .menuTopBar a{
+            height: 52px;
+            text-decoration: none;
+            font-size: 15px;
+            vertical-align: middle;
+            color: #FFFFFF;
+        }
+        .menuTopBar .botonMenuTop:hover{
+            background-color: #008e76;
+        }
+        .menuTopBar .botonMenuTop{
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background-color: #00bfa5;
+            color: #ffffff;
+        }
+        @media (max-width: 991px) {
+            body {
+                margin: 150px 0 0;
+            }
+            .menuTopBarS{
+                padding: 0 0 0;
+                background-color: black;
+            }
+        }
+    </style>
+
+    <title>Política de publicación</title>
+</head>
+
+<body>
+    <dgm-navbar></dgm-navbar>
+    
+    <div class="menuTopBar menuTopBarS">
+        <div class="col-xs-3" style="padding: 0 0 0;">
+            <a href="/contratacionesabiertas/contratos/" class="botonMenuTop">Inicio</a>
+        </div>
+        <div class="col-xs-3" style="padding: 0 0 0;">
+            <a href="/contratacionesabiertas/politicadepublicacion" class="botonMenuTop"  style="background-color: #008e76">Política de publicación</a>
+        </div>
+        <div class="col-xs-3" style="padding: 0 0 0;">
+            <a href="/contratacionesabiertas/implementa" class="botonMenuTop">Implementa el EDCA-MX</a>
+        </div>
+        <div class="col-xs-3" style="padding: 0 0 0;">
+            <a href="/contratacionesabiertas/datosabiertos" class="botonMenuTop">Datos abiertos</a>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-default navbar-fixed-top hidden-sm hidden-xs">              
+            <div class="container">   
+                    <ul class="breadcrumb">
+                        <li><a href="/contratacionesabiertas/"><i class="glyphicon glyphicon-home"></i></a></li>
+                        <li><a href="/contratacionesabiertas/contratos/">Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales</a></li>
+                        <li><a href="#">Política de publicación</a></li>
+                    </ul>
+            </div>               
+     </nav>
+    
+    <div class="breadcrumb-container">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                 <!--     <li><a href="/contratacionesabiertas/"><i class="glyphicon glyphicon-home"></i></a></li>
+                      <li><a href="/contratacionesabiertas/contratos/">Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales</a></li>
+                      <li><a href="#">Acerca</a></li>  -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 post">
+                <div id="policy"></div>
+            </div>
+        </div>
+    </div>
+	<br>
+	<br>
+
+    <dgm-footer></dgm-footer>
+    <script src="/contratacionesabiertas/static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="<%= process.env.CDN_URL %>/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var uri = globals.site.url;
+            var port = globals.site.port;
+            $.ajax({
+                    url: `${uri}:${port}/edca/policy`,
+                    type: 'GET',
+                    success: function(value){ 
+                        $("#policy").html(value.policy);
+                    },
+                    error: function(value) {
+                        $("#policy").val('Not Found');
+                    }
+                });
+        });
+    </script>
+</body>
+
+</html>

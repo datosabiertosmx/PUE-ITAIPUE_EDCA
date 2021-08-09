@@ -1,0 +1,81 @@
+<style>
+    .ui-autocomplete {
+        z-index: 9999 !important;
+    }
+
+    .ui-menu-item:hover {
+        background-color: #0275d8;
+        color: white;
+    }
+
+    .ui-menu-item div {
+        background-color: transparent;
+    }
+
+
+    .map-container {
+        position: relative;
+    }
+
+    .map-geocoding {
+        position: absolute;
+        top: 9px;
+        right: 53px;
+        width: 80%;
+        z-index: 1;
+        height: 42px;
+    }
+
+    .map-geocoding input,
+    .map-geocoding button{
+        background: #fff;
+        height: 42px;
+    }
+
+    .map-geocoding-result {
+        position: absolute;
+        left: 0;
+        right: 39px;
+        top: 42px;
+    }
+
+    #map {
+        height: 500px;
+    }
+</style>
+<form id="update_location_project_form">
+    <input type="text" name="location_id" value = "<%= data[0].id %>" hidden>
+    <input type="hidden" name="location_countryname_p" value = "<%= data[0].address[0].countryName %>">
+    <input type="hidden" name="location_streetaddress_p" value = "<%= data[0].address[0].streetAddress %>">
+    <input type="hidden" name="location_region_p" value = "<%= data[0].address[0].region %>">
+    <input type="hidden" name="location_locality_p" value = "<%= data[0].address[0].locality %>">
+    <input type="hidden" name="location_postalcode_p" value = "<%= data[0].address[0].postalCode %>"> 
+    <input type="hidden" name="latitude_p" value = "<%= data[0].coordinates[0].point %>">
+    <input type="hidden" name="longitude_p" value = "<%= data[0].coordinates[1].point %>">
+    <input type="hidden" name="locations_geometry_type" value="Point">
+
+    <p>
+        <label data-tooltip="crear_proceso" title="Un nombre o descripción de esta ubicación. Esto puede incluir el nombre(s) de la ubicación(es), o puede proporcionar una descripción legible por humanos de la ubicación cubierta. Esta descripción puede ser usada en una interfaz de usuario.">
+            Descripción </label>
+        <textarea class="form-control" name="locations_description" rows="5" minlength="1" maxlength="900" value ="<%= data[0].description %>" required><%=(typeof data[0].description!= "undefined")? data[0].description : ''%></textarea>
+    </p>
+    
+    <label data-tooltip="crear_proceso" title='Ubicación del item'>
+        <h4>Ubicación</h4>
+    </label>
+    <div class="map-container">
+        <div class="map-geocoding input-group">
+            <input  type="search" class="form-control" placeholder="Buscar dirección" value="<%= `${data[0].address[0].streetAddress || ''} ${data[0].address[0].region || ''} ${data[0].address[0].countryName || ''}`.trim() %>"/>
+            <div class="input-group-btn">
+                <button id="btnGeocoding" type="button" class="btn btn-default"><i class="fa fa-search"></i></button>
+            </div>
+            <ul class="map-geocoding-result list-group"></ul>
+        </div>
+        
+        <div id="map"></div>
+    </div>
+    <br>
+
+    <button type="submit" class="btn btn-default">Actualizar</button>
+</form>
+<script src="/javascript/mapbox.js"></script>

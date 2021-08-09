@@ -1,0 +1,444 @@
+<% function formatAmount( amount ) {
+    return (amount !== null)?amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","):''
+ }%>
+ <!DOCTYPE html>
+ <html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" lang="es-MX" xml:lang="es-MX">
+    <head>
+        <!-- Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-KNYE7DF2RM"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-KNYE7DF2RM');
+        </script>
+        <!-- End Google Analytics -->
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/contratacionesabiertas/static/bower_components/font-awesome/css/font-awesome.min.css">
+        <!-- Bootstrap core CSS -->
+        <link href="/contratacionesabiertas/static/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/contratacionesabiertas/static/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        <link rel='stylesheet' href='/contratacionesabiertas/static/stylesheets/style_d3bubble.css'/>
+        <link rel="stylesheet" type="text/css" href="/contratacionesabiertas/static/bower_components/jqplot/jquery.jqplot.css"/>
+        <link rel="stylesheet" type="text/css" href="/contratacionesabiertas/static/bower_components/tooltipster/dist/css/tooltipster.bundle.min.css" />
+        <link rel="stylesheet" type="text/css" href="/contratacionesabiertas/static/bower_components/tooltipster-follower/dist/css/tooltipster-follower.min.css"/>
+        <link rel='stylesheet' href='/contratacionesabiertas/static/stylesheets/main.css'/>
+        <link rel="stylesheet" href="/contratacionesabiertas/static/stylesheets/dashboard.css">
+        <link rel="import" href="<%= process.env.CDN_URL %>/bower_components/polymer/polymer.html"> 
+        <link rel="import" href="/contratacionesabiertas/static/inai-navbar/dgm-navbar.html">
+        <link rel="import" href="/contratacionesabiertas/static/inai-footer/dgm-footer.html">
+        <script src="/contratacionesabiertas/static/javascripts/common.js"></script> 
+        <title><%= title %></title>
+    </head>
+    <body>
+        <dgm-navbar></dgm-navbar>
+        <div class="container menuTopBar menuTopBarS">
+            <div class="col-xs-3" style="padding: 0 0 0;">
+                <select id="yearFilter" class="despMov" style="padding: 0 0 0;">
+                </select>
+            </div>
+            <div class="col-xs-3" style="padding: 0 0 0;">
+                <a href="/contratacionesabiertas/politicadepublicacion" class="botonMenuTop">Política de publicación</a>
+            </div>
+            <div class="col-xs-3" style="padding: 0 0 0;">
+                <a href="/contratacionesabiertas/implementa" class="botonMenuTop">Implementa el EDCA-MX</a>
+            </div>
+            <div class="col-xs-3" style="padding: 0 0 0;">
+                <a href="/contratacionesabiertas/datosabiertos" class="botonMenuTop">Datos abiertos</a>
+            </div>
+        </div>
+        <div class="bgimg bgMovil">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <img src="/contratacionesabiertas/static/images/banner-logo.png" alt="logo banner" style="margin-top: 3em; height: 100px; width: 100px;">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                            <h3 style="color:#008e76; font-weight:bold; font-size: 18px">Descubre los datos abiertos, accesibles y oportunos sobre las etapas de planeación, licitación, adjudicación, contratación y ejecución de todas las contrataciones y convenios del INAI</h3> 
+                    </div>
+                </div>
+                
+                <div id="datos_duros">
+                    <div class="row">
+                        <div class="col-sm-4 widget">
+                            <p style="color:#4d4d4d; font-size: 18px;">Monto contratado en MXN</p>
+                            <p class="stat" style="color:#4d4d4d; font-size: 25px; font-weight: bold">$<%= (metadata.contract_exchangerate_amount_total != null ? parseInt(metadata.contract_exchangerate_amount_total) : 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %></p>
+                        </div>
+        
+                        <div class="col-sm-4 widget">
+                            <p style="color:#4d4d4d; font-size: 18px;">Procedimientos de contratación</p>
+                            <p class="stat" style="color:#4d4d4d; font-size: 25px; font-weight: bold;"><%= metadata.cp_count %></p>
+                        </div>
+        
+                        <div class="col-sm-4 widget">
+                            <p style="color:#4d4d4d; font-size: 18px;">Proveedores</p>
+                            <p class="stat" style="color:#4d4d4d; font-size: 25px; font-weight: bold;"><%= metadata.supplier_count %></p>
+                        </div>
+                    </div>
+                </div>       
+            </div>
+        </div>
+        <div class="container statistics">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Procedimiento y destino de la contratación</h1>
+                    <p style="font-size: large"> Visualiza la distribución de los montos según el procedimiento de contratación utilizado.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="nav nav-pills">
+                        <li class="active"><a data-toggle="tab" href="#home">Procedimiento de contratación</a></li>
+                        <li><a data-toggle="tab" href="#categoria" id="cat" >Destino de la Contratación</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-content">
+                <div id="home" class="tab-pane fade in active">
+                    <div class="well">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div id="chart4" style="text-align: center; color: #fff; font-size: 12pt; height: 400px;"></div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <ul class="chart-legend">
+                                                <li><span class="circle" style="background-color: #ffcc00"></span>Licitación pública</li>
+                                                <li><span class="circle" style="background-color: #00cc99"></span>Adjudicación directa</li> 
+                                                <li><span class="circle" style="background-color: #663399"></span>Invitación a cuando menos tres personas</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div id="tablaChartDonut">
+                                        <div class="data-table table-responsive" style="background: #cdcdcd;">
+                                            <table class="table no-cursor">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Procedimiento de contratación</th>
+                                                        <th>Monto contratado MXN</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% if ( metadata.total_procedimiento[0] ){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_procedimiento[0].procurementmethod_details %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_procedimiento[0].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                    <% if ( metadata.total_procedimiento[1] ){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_procedimiento[1].procurementmethod_details %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_procedimiento[1].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                    <% if ( metadata.total_procedimiento[2]){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_procedimiento[2].procurementmethod_details %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_procedimiento[2].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                    
+                                                    <tr>
+                                                        <td><strong>Total</strong></td>
+                                                        <td style="text-align: right"><strong>$<%= formatAmount( metadata.contract_exchangerate_amount_total )%></strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+        
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="categoria" class="tab-pane fade">
+                    <div class="well">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div id="donutchart2" style="text-align: center; color: #fff; font-size: 12pt; height: 400px;"></div>
+                                    <ul class="chart-legend">   	                    
+                                        <li><span class="circle" style="background-color: #00cc99"></span>Adquisición de bienes</li>
+                                        <li><span class="circle" style="background-color: #00BFFF"></span>Arrendamiento de bienes</li>
+                                        <li><span class="circle" style="background-color: #ffcc00"></span>Obras públicas</li>
+                                        <li><span class="circle" style="background-color: #ff6600"></span>Servicios</li>
+                                        <li><span class="circle" style="background-color: #663399"></span>Servicios relacionados con obras públicas</li>                 	
+                                    </ul>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div id="tablaChartDonut2">
+                                        <div class="data-table table-responsive" style="background: #cdcdcd;">
+                                            <table class="table no-cursor">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Destino de la contratación</th>
+                                                        <th>Monto contratado MXN</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>                                                   
+                                                    <% if ( metadata.total_destino[0] ){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_destino[0].additionalprocurementcategories %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_destino[0].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                    <% if ( metadata.total_destino[1] ){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_destino[1].additionalprocurementcategories %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_destino[1].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                    <% if ( metadata.total_destino[2]){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_destino[2].additionalprocurementcategories %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_destino[2].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                    <% if ( metadata.total_destino[3]){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_destino[3].additionalprocurementcategories %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_destino[3].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                    <% if ( metadata.total_destino[4]){%>
+                                                    <tr>
+                                                        <td> <%= metadata.total_destino[4].additionalprocurementcategories %></td>
+                                                        <td style="text-align: right"> <strong>$<%= formatAmount( metadata.total_destino[4].total ) %></strong></td>
+                                                    </tr>
+                                                    <%}%>
+                                                            
+                                                    <tr>
+                                                        <td><strong>Total</strong></td>
+                                                        <td style="text-align: right"><strong>$<%= formatAmount( metadata.contract_exchangerate_amount_total )%></strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+        
+            <div id="procedimientos_etapas">
+                <h1>Procedimientos por etapas</h1>
+                <div class="well">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div id="stages_chart" class="row" style="height: 450px;"></div>
+                        </div>
+                        <div class="col-sm-12">
+                            <ul class="chart-legend ul-horizontal">
+                                <li data-stage="0"><span class="square" style="background-color: #F19192"></span>Planeación</li>
+                                <li data-stage="1"><span class="square" style="background-color: #D6D52D"></span>Licitación</li>                	                    
+                                <li data-stage="2"><span class="square" style="background-color: #2AA24A"></span>Adjudicación</li>
+                                <li data-stage="3"><span class="square" style="background-color: #1F8BC5"></span>Contratación</li>
+                                <li data-stage="4"><span class="square" style="background-color: #79357C"></span>Ejecución</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div id="proveedores">
+                <h1>Información general de contratos y proveedores</h1>
+                <p style="font-size: large; padding-bottom: 5px">Explora contratos y proveedores de acuerdo con su nombre o razón social, procedimiento de contratación o vigencia del contrato.</p>
+                <div class="well">
+                    <nav class="navbar navbar-default" role="navigation">
+                        <div id="navbar" class="navbar-collapse collapse">
+                            <ul id="visualizador" class="nav navbar-nav">
+                                <li class="dropdown">       <!--Tamaño del combo filtro Gráfico Información general de contratos y proveedores -->
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><strong>Filtrar <span class="caret"></span></strong></a>
+                                    <ul id="filtros" class="dropdown-menu scrollable-menu container-me" style="width: 1300%;">
+                                        <div >
+                                            <div class="row">
+                                                <div style="display: inline-block; width: 19%;margin-left: 8px;">
+                                                    <a class="nameGreen">Proveedor</a><br>
+                                                    <input checked=true type="checkbox" class="clear" id="cProveedor"> <a class="selectAll">Seleccionar todo</a>
+                                                </div>
+                                                <div style="display: inline-block; width: 19%;margin-left: 8px;">
+                                                    <a class="nameGreen">Procedimiento de contratación</a></br>
+                                                    <input checked=true type="checkbox" class="clear" id="cProcedimiento"> <a class="selectAll">Seleccionar todo</a>
+                                                </div>
+                                                <div style="display: inline-block; width: 19%;margin-left: 8px;">
+                                                    <a class="nameGreen">Destino de contratación</a><br>
+                                                    <input checked=true type="checkbox" class="clear" id="cDestino"> <a class="selectAll">Seleccionar todo</a>
+                                                </div>
+                                                <div style="display: inline-block; width: 19%;margin-left: 8px; ">
+                                                    <a class="nameGreen">Área requirente</a><br>
+                                                    <input checked=true type="checkbox" class="clear" id="cArea"> <a class="selectAll">Seleccionar todo</a>
+                                                </div>
+                                                <div style="display: inline-block; width: 19%;margin-left: 8px;">
+                                                    <a class="nameGreen">Vigencia del contrato</a><br>
+                                                    <input checked=true type="checkbox" class="clear" id="cVigencia"> <a class="selectAll">Seleccionar todo</a>
+                                                </div> 
+                                            </div>
+                                            <li class="divider"></li>
+                                            <div id="filter-list" class="row"></div>
+                                        </div>
+                                    </ul>
+                                </li>
+                                <div style="margin-left: 30px;" id="search_form" class="navbar-form navbar-left">
+                                    <div class="input-group">
+                                        <input type="text" id="buscar_bubble" value="" class="form-control" placeholder="Buscar proveedores" aria-describedby="basic-addon1">
+                                        <span class="input-group-addon" id="basic-addon1">
+                                            <i class="glyphicon glyphicon-search"></i>
+                                        </span>
+                                    </div>  
+                                </div>
+                                <div style="margin-left: 30px; margin-right: 30px;" class="form-group navbar-form navbar-left">
+                                    <select id='group-everything-by' class="form-control">
+                                        <option value=''>Agrupar</option>
+                                    </select>
+                                </div>
+                                <div class="form-group navbar-form navbar-left">
+                                    <select id='color-everything-by' class="form-control">
+                                        <option value=''>Colorear</option>
+                                    </select>
+                                </div>
+
+                            </ul>
+                        </div>                        
+                    </nav>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <!-- d3 bubble chart-->
+                            <div id="vis" class="svg-container"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div id='color-hints'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+               
+            <div id="contrataciones_tiempo">
+                <h1>Contrataciones en el tiempo (histórico)</h1>
+                <p style="font-size: large; padding-bottom: 10px">Visualiza las contrataciones por procedimiento, vigencia, fecha de firma y monto.</p>
+                <div class="well series-chart">
+                    <div id="series_chart_div" class="row" style="height: 450px;"></div>
+                        <ul class="chart-legend navega">
+                            <li style="font-size: 17px"><span class="circle" style="background-color: #ffcc00"></span>Licitación pública</li>
+                            <li style="font-size: 17px"><span class="circle" style="background-color: #00cc99"></span>Adjudicación directa</li>
+                            <li style="font-size: 17px"><span class="circle" style="background-color: #663399"></span>Invitación a cuando menos tres</li>
+                        </ul>
+                        <br>
+                    <p style="text-align: right">Entre más grande es el círculo, mayor es el monto contratado.</p>
+                </div>
+            </div>
+
+            <h1 id="lista">Lista de contrataciones</h1>
+            <p style="font-size: large">Busca y explora los datos de las diferentes etapas para cada contratación</p>
+            <small><a href="/contratacionesabiertas/acerca" >Conoce más</a> sobre la implementación del Estándar de Datos de Contrataciones Abiertas en el INAI</small>
+            <div class="row" id="busqueda_contratos">
+                <div class="col-md-12">
+                    <form class="form-inline search-form">
+                        <input type="text" id="keyword" class="form-control" style="WIDTH: 50%;" placeholder="Buscar contrataciones abiertas">
+                        <button type="button"  class="form-control" id="anotherkeyword"><i class="fa fa-search"></i></button>
+
+                        <select id="processFilter" class="form-control bootstrap-select">
+                            <option value="">Tipo de procedimiento</option>
+                            <%for ( var i=0; i< metadata.total_procedimiento.length;i++){%>
+                            <option value="<%= metadata.total_procedimiento[i].procurementmethod_details %>"><%= metadata.total_procedimiento[i].procurementmethod_details %></option>
+                            <%}%>
+                        </select>
+
+                        <select id="orderby" class="form-control bootstrap-select">
+                            <option value="exchangerate_amount">Ordenar por monto</option>
+                            <option value="title">Ordenar por nombre</option>
+                            <option value="datesigned">Ordenar por fecha</option>
+                            <option value="ocid">Ordenar por ID</option>
+                            <option value="name">Ordenar por Área requirente</option>
+                        </select>
+                        
+                    </form>
+                </div>
+            </div>
+        
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- Lista de contratos -->
+                    <div id="ctable"></div>
+        
+                </div>
+            </div>
+        </div>  
+        <input id="metadataYear" type="hidden" value="<%= metadata.year %>">
+        <dgm-footer></dgm-footer>
+        
+        <script src="/contratacionesabiertas/static/bower_components/jquery/dist/jquery.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                var uri = globals.site.url;
+                var port = globals.site.port;
+                var endPointFiscalYear = '/edca/fiscalYears';
+                $.ajax({
+                    url: `${uri}:${port}${endPointFiscalYear}`,
+                    type: 'GET',
+                    success: function(data){ 
+                        var metadataYear = $('#metadataYear').val();
+                        $('#yearFilter').append(`<option value=''>Todos los años</option>`);
+                        data.fiscalYears.forEach(element => {
+                            $('#yearFilter').append(`<option value='${element.year}' ${metadataYear != null && element.year == metadataYear ? 'selected' : ''} > ${element.year}</option>`);
+                        });
+                    },
+                    error: function(data) {
+                        $('#yearFilter').append('<option value=""> Not Found </option>');
+                    }
+                });
+            });
+        </script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/jquery.jqplot.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.barRenderer.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.donutRenderer.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.enhancedLegendRenderer.min.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.categoryAxisRenderer.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.pointLabels.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/jqplot/plugins/jqplot.highlighter.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+        <script src="https://d3js.org/d3.v3.min.js"></script>
+        <script type="text/javascript" src="<%= process.env.CDN_URL %>/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="/contratacionesabiertas/static/javascripts/dashboard.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/tooltipster/dist/js/tooltipster.bundle.min.js"></script>
+        <script type="text/javascript" src="/contratacionesabiertas/static/bower_components/tooltipster-follower/dist/js/tooltipster-follower.min.js"></script>
+        
+        <!-- Archivo que contiene las funciones para la visualizacion de los elementos -->
+        <script type="text/javascript" src="/contratacionesabiertas/static/javascripts/js/vis.js"></script>
+        <!-- Archivo que contiene las funciones para los eventos -->
+        <script type="text/javascript" src="/contratacionesabiertas/static/javascripts/js/custom.js"></script>
+        
+        <script>
+        $('.progress-bar').tooltipster({
+            delay : 0,
+            contentAsHTML: true,
+            minWidth: 150,
+            offset: [20, 20],
+            plugins: ['follower'],
+            theme: ['tooltipster-default']
+        });
+        
+            (function () {
+                $( '.bootstrap-select' ).selectpicker();
+            })();
+        
+            $('#naicm').click(function () {
+            window.open("https://datos.gob.mx/busca/organization/inai", "_blank");
+            });
+        </script>
+    </body>
+ </html>
